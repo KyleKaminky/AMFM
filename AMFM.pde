@@ -265,8 +265,8 @@ void renderSignals(int s_opacity) {
     //int index_1 = (x+theta - 1) % NUM_POINTS;
     //y_1 = height/3 - digital_signal[index_1]*AMPLITUDE + AMPLITUDE/2;
     //y_2 = height/3 - digital_signal[index_2]*AMPLITUDE + AMPLITUDE/2;
-    y_1 = height/3 - message_yvalues[x-1]*AMPLITUDE + AMPLITUDE/2;
-    y_2 = height/3 - message_yvalues[x]*AMPLITUDE + AMPLITUDE/2;
+    y_1 = height/3 - message_yvalues[x-1]*1 + AMPLITUDE/2;
+    y_2 = height/3 - message_yvalues[x]*1 + AMPLITUDE/2;
     
     line(x_1, y_1, x_2, y_2);
 
