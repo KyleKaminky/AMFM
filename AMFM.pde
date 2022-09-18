@@ -1,6 +1,6 @@
 /*
-                           TITLE
-                           ----------------
+                    Amplitude and Frequency Modulation
+                    ----------------------------------
    Description
    
 */
@@ -31,7 +31,6 @@ float[] am_y, fm_y;
 
 
 void setup() {
-  //frameRate(25);
   size(1080, 1080);
   pixelDensity(displayDensity());
   
@@ -100,6 +99,9 @@ void calcSignals() {
     //am_y = (1+message_y[i]) * carrier_amplitude;
     am_y[i] = (1-message_y[i]/carrier_amplitude)*carrier_amplitude*sin(F_CARRIER*x);
     
+    float f = map(message_y[i], 0, 100, 1, 80);
+    fm_y[i] = carrier_amplitude*sin(f*x);
+    
     x+=dx;
   }
   
@@ -122,5 +124,9 @@ void renderSignals() {
       stroke(#FF0000);
       line((x-1)*xspacing+width - GAP - signal_width, height/4 + message_y[x-1] - carrier_amplitude, x*xspacing+width - GAP -signal_width, height/4+message_y[x]-carrier_amplitude);
     }
+    
+    // FM
+    stroke(255);
+    line((x-1)*xspacing+width - GAP -signal_width, 3*height/4 + fm_y[x-1], x*xspacing+width - GAP -signal_width, 3*height/4+fm_y[x]);
   }
 }
