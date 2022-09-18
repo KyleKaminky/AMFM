@@ -12,13 +12,14 @@
 final int GAP = 50;
 float xspacing = 0.5;
 int signal_width;              // Width of entire wave
-int maxwaves = 10;   // total # of waves to add together
+int maxwaves = 1;   // total # of waves to add together
 float[] message_amplitude = new float[maxwaves];
 float[] message_dx = new float[maxwaves];
+final float K_f = 0.2;
 
-final float F_CARRIER = 40;
+final float F_CARRIER = 5;
 final float F_MESSAGE = 2;
-final float DELTA_THETA = 0.01;
+final float DELTA_THETA = 0.001;
 
 float theta = 0.0;  // Start angle at 0
 float carrier_amplitude = 80.0;  // Height of wave
@@ -58,8 +59,10 @@ void draw() {
 
 void initMessageAmplitudes() {
    for (int i = 0; i < maxwaves; i++) {
-    message_amplitude[i] = random(5,15);
-    float period = random(100,300); // How many pixels before the wave repeats
+    //message_amplitude[i] = random(5,15);
+    message_amplitude[i] = 25;
+    //float period = random(100,300); // How many pixels before the wave repeats
+    float period = 2000; // How many pixels before the wave repeats
     message_dx[i] = (TWO_PI / period) * xspacing;
   }
 }
@@ -81,9 +84,9 @@ void calcSignals() {
     x = theta;
     for (int i = 0; i < message_y.length; i++) {
       // Every other wave is cosine instead of sine
-      if (j % 2 == 0)  message_y[i] += sin(F_MESSAGE*x)*message_amplitude[j];
-      else message_y[i] += cos(F_MESSAGE*x)*message_amplitude[j];
-      //message_y[i] = sin(F_MESSAGE*x)*message_amplitude[j];
+      if (j % 2 == 0)  message_y[i] += sin(2*PI*F_MESSAGE*x)*message_amplitude[j];
+      else message_y[i] += cos(2*PI*F_MESSAGE*x)*message_amplitude[j];
+      message_y[i] = 10;
       x+=message_dx[j];
     }
   }
@@ -91,16 +94,17 @@ void calcSignals() {
   x = theta;
   for (int i = 0; i < am_y.length; i++) {
     // CARRIER
-    carrier_y[i] = sin(F_CARRIER*x)*carrier_amplitude;
+    carrier_y[i] = sin(2*PI*F_CARRIER*x)*carrier_amplitude;
     
     // AM
-    float mod_index = max(message_y)/carrier_amplitude;
-    println(mod_index);
+    //float mod_index = max(message_y)/carrier_amplitude;
+    //println(mod_index);
     //am_y = (1+message_y[i]) * carrier_amplitude;
-    am_y[i] = (1-message_y[i]/carrier_amplitude)*carrier_amplitude*sin(F_CARRIER*x);
+    am_y[i] = (1-message_y[i]/carrier_amplitude)*carrier_amplitude*sin(2*PI*F_CARRIER*x);
     
-    float f = map(message_y[i], 0, 100, 1, 80);
-    fm_y[i] = carrier_amplitude*sin(f*x);
+    float delta_f = K_f * -(message_y[i]);
+    println(delta_f);
+    fm_y[i] = carrier_amplitude*cos(2*PI*F_CARRIER*x + delta_f/F_MESSAGE*sin(2*PI*F_MESSAGE*x));
     
     x+=dx;
   }
@@ -128,5 +132,10 @@ void renderSignals() {
     // FM
     stroke(255);
     line((x-1)*xspacing+width - GAP -signal_width, 3*height/4 + fm_y[x-1], x*xspacing+width - GAP -signal_width, 3*height/4+fm_y[x]);
+    if ((x / 5) % 2 == 0){
+      stroke(#FF0000);
+      line((x-1)*xspacing+width - GAP - signal_width, 3*height/4 + message_y[x-1] - carrier_amplitude, x*xspacing+width - GAP -signal_width, 3*height/4+message_y[x]-carrier_amplitude);
+    }
+    
   }
 }
