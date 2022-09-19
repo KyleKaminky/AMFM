@@ -12,18 +12,20 @@
 final int GAP = 50;
 float xspacing = 0.5;
 int signal_width;              // Width of entire wave
-int maxwaves = 1;   // total # of waves to add together
+int maxwaves = 25;   // total # of waves to add together
 float[] message_amplitude = new float[maxwaves];
-float[] message_dx = new float[maxwaves];
-final float K_f = 0.2;
+float[] message_frequencies = new float[maxwaves];
+final float F_MESSAGE_MAX = 3;
+final float F_MESSAGE_MIN = 0.1;
+//float[] message_dx = new float[maxwaves];
+final float K_f = 0.08;
 
-final float F_CARRIER = 5;
-final float F_MESSAGE = 2;
-final float DELTA_THETA = 0.001;
+final float F_CARRIER = 10;
+final float DELTA_THETA = 0.01;
 
 float theta = 0.0;  // Start angle at 0
 float carrier_amplitude = 80.0;  // Height of wave
-float period = 500.0;  // How many pixels before the wave repeats
+float period = 1000.0;  // How many pixels before the wave repeats
 float dx;  // Value for incrementing X, a function of period and xspacing
 float[] carrier_y;  // Using an array to store height values for the wave
 float[] message_y;
@@ -59,11 +61,11 @@ void draw() {
 
 void initMessageAmplitudes() {
    for (int i = 0; i < maxwaves; i++) {
-    //message_amplitude[i] = random(5,15);
-    message_amplitude[i] = 25;
+    message_amplitude[i] = random(5,15);
+    //message_amplitude[i] = 55;
     //float period = random(100,300); // How many pixels before the wave repeats
-    float period = 2000; // How many pixels before the wave repeats
-    message_dx[i] = (TWO_PI / period) * xspacing;
+    message_frequencies[i] = random(F_MESSAGE_MIN, F_MESSAGE_MAX);
+    //message_frequencies[i] = 0;
   }
 }
 
@@ -73,21 +75,18 @@ void calcSignals() {
   float x = theta;
   // Set all height values to zero
   for (int i = 0; i < message_y.length; i++) {
-    
     message_y[i] = 0;
-    
-    x+=dx;
   }
- 
+
   // Accumulate wave height values
   for (int j = 0; j < maxwaves; j++) {
     x = theta;
     for (int i = 0; i < message_y.length; i++) {
       // Every other wave is cosine instead of sine
-      if (j % 2 == 0)  message_y[i] += sin(2*PI*F_MESSAGE*x)*message_amplitude[j];
-      else message_y[i] += cos(2*PI*F_MESSAGE*x)*message_amplitude[j];
-      message_y[i] = 10;
-      x+=message_dx[j];
+      if (j % 2 == 0)  message_y[i] += sin(2*PI*message_frequencies[j]*x)*message_amplitude[j];
+      else message_y[i] += cos(2*PI*message_frequencies[j]*x)*message_amplitude[j];
+      //message_y[i] = 10;
+      x+=dx;
     }
   }
   
@@ -103,8 +102,11 @@ void calcSignals() {
     am_y[i] = (1-message_y[i]/carrier_amplitude)*carrier_amplitude*sin(2*PI*F_CARRIER*x);
     
     float delta_f = K_f * -(message_y[i]);
-    println(delta_f);
-    fm_y[i] = carrier_amplitude*cos(2*PI*F_CARRIER*x + delta_f/F_MESSAGE*sin(2*PI*F_MESSAGE*x));
+    println(str(delta_f) + " : " + str(message_y[i]));
+    //float f = map(message_y[i], -50, 50, -1, 1);
+    fm_y[i] = carrier_amplitude*cos(2*PI*F_CARRIER*x + delta_f/F_MESSAGE_MAX*sin(2*PI*F_MESSAGE_MAX*x));
+    
+    //fm_y[i] = carrier_amplitude*cos(2*PI*(F_CARRIER+f)*x);
     
     x+=dx;
   }
