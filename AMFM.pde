@@ -8,15 +8,21 @@
 
 // Global Constants
 final int BG_COLOR = 0;
+final int FRAMEWORK_COLOR = 255;
+final int MESSAGE_COLOR = #FF0000;
+final int AM_COLOR = 255;
+final int FM_COLOR = 255;
+final int CARRIER_COLOR = 255;
+
 final int TRIANGLE_SIZE = 10;
 final int MIXER_SIZE = 1080/15;
-final int FRAMEWORK_COLOR = 255;
 final int WIDTH = 1080/3;
 final int AMPLITUDE = 0;
 final String TITLE = "Amplitude (AM) & Frequency (FM) Modulation";
 final int TITLE_Y = 50;
 final float FM_Y = 1080*3/4;
 final float AM_Y = 1080*1/4;
+final int DASHED_LINE = 15;
 
 // Global Variables
 final int GAP = 50;
@@ -124,6 +130,8 @@ void drawFramework(int m_opacity) {
   text("Carrier Signal", width/2, height/2 + carrier_amplitude*1.2);
   text("AM Signal", width - GAP - signal_width/2, AM_Y + carrier_amplitude*1.5);
   text("FM Signal", width - GAP - signal_width/2, FM_Y + carrier_amplitude*1.2);
+  text("Amplitude Modulator", width/2, AM_Y - MIXER_SIZE);
+  text("Frequency Modulator", width/2, FM_Y + MIXER_SIZE);
   
   fill(BG_COLOR, 255);
   strokeWeight(3);
@@ -174,6 +182,15 @@ void drawFramework(int m_opacity) {
   triangle(x_1, y_1, x_2, y_2, x_3, y_3);
   triangle(x_1, height - y_1, x_2, height - y_2, x_3, height - y_3);
   
+  x_1 = width - GAP - signal_width*1.1 - TRIANGLE_SIZE;
+  y_1 = AM_Y + TRIANGLE_SIZE/2;
+  x_2 = width - GAP - signal_width*1.1 - TRIANGLE_SIZE ;
+  y_2 = AM_Y - TRIANGLE_SIZE/2;
+  x_3 = width - GAP - signal_width*1.1;
+  y_3 = AM_Y;
+  triangle(x_1, y_1, x_2, y_2, x_3, y_3);
+  triangle(x_1, height - y_1, x_2, height - y_2, x_3, height - y_3);
+  
 
 } // End of drawFramework()
 
@@ -199,7 +216,6 @@ void initMessageAmplitudes() {
     //message_amplitude[i] = 5;
     //float period = random(100,300); // How many pixels before the wave repeats
     message_frequencies[i] = random(F_MESSAGE_MIN, F_MESSAGE_MAX);
-    //message_frequencies[i] = 0;
   }
 }
 
@@ -219,7 +235,7 @@ void calcSignals() {
       // Every other wave is cosine instead of sine
       if (j % 2 == 0)  message_y[i] += sin(2*PI*message_frequencies[j]*x)*message_amplitude[j];
       else message_y[i] += cos(2*PI*message_frequencies[j]*x)*message_amplitude[j];
-      //message_y[i] = 10;
+      
       x+=dx;
     }
   }
@@ -227,26 +243,17 @@ void calcSignals() {
   x = theta;
   float sum = 0.0;
   for (int i = 0; i < am_y.length; i++) {
+    
     // CARRIER
     carrier_y[i] = sin(2*PI*F_CARRIER*x)*carrier_amplitude;
     
-    // AM
-    //float mod_index = max(message_y)/carrier_amplitude;
-    //println(mod_index);
-    //am_y = (1+message_y[i]) * carrier_amplitude;
+    // Calc AM
     am_y[i] = (1-message_y[i]/carrier_amplitude)*carrier_amplitude*sin(2*PI*F_CARRIER*x);
     
-    float delta_f = K_f * -(message_y[i]);
-    println(str(delta_f) + " : " + str(message_y[i]));
-    //float f = map(message_y[i], -50, 50, -1, 1);
-    
+   // Calc FM
     sum += message_y[i]/2 - 15;
     float phi = 2*PI*F_CARRIER*x - K_f*(sum+100);
-    //float phi = F_CARRIER*x + K_f * message_y[i];
     fm_y[i] = carrier_amplitude*cos(phi);
-    //fm_y[i] = carrier_amplitude*cos(2*PI*F_CARRIER*x + delta_f/F_MESSAGE_MAX*sin(2*PI*F_MESSAGE_MAX*x));
-    
-    //fm_y[i] = carrier_amplitude*cos(2*PI*(F_CARRIER+f)*x);
     
     x+=dx;
   }
@@ -259,24 +266,26 @@ void renderSignals(int s_opacity) {
   // A simple way to draw the wave with an ellipse at each location
   for (int x = 1; x < carrier_y.length; x++) {
     // Carrier
-    stroke(255, s_opacity);
+    stroke(CARRIER_COLOR, s_opacity);
     line((x-1)*xspacing+width/2 - signal_width/2, height/2 + carrier_y[x-1], x*xspacing+width/2 - signal_width/2, height/2+carrier_y[x]);
     
     // Message
+    stroke(MESSAGE_COLOR, s_opacity);
     line((x-1)*xspacing + GAP, height/2 + message_y[x-1], x*xspacing + GAP, height/2 + message_y[x]);
     
     // AM
+    stroke(AM_COLOR, s_opacity);
     line((x-1)*xspacing+width - GAP -signal_width, AM_Y + am_y[x-1], x*xspacing+width - GAP -signal_width, AM_Y + am_y[x]);
-    if ((x / 10) % 2 == 0){
-      stroke(#FF0000);
+    if ((x / DASHED_LINE) % 2 == 0){
+      stroke(MESSAGE_COLOR, s_opacity);
       line((x-1)*xspacing+width - GAP - signal_width, AM_Y + message_y[x-1] - carrier_amplitude, x*xspacing+width - GAP -signal_width, AM_Y + message_y[x]-carrier_amplitude);
     }
     
     // FM
-    stroke(255, s_opacity);
+    stroke(FM_COLOR, s_opacity);
     line((x-1)*xspacing+width - GAP -signal_width, FM_Y + fm_y[x-1], x*xspacing+width - GAP -signal_width, FM_Y+fm_y[x]);
-    if ((x / 10) % 2 == 0){
-      stroke(#FF0000, s_opacity);
+    if ((x / DASHED_LINE) % 2 == 0){
+      stroke(MESSAGE_COLOR, s_opacity);
       line((x-1)*xspacing+width - GAP - signal_width, FM_Y + message_y[x-1] - carrier_amplitude*1.5, x*xspacing+width - GAP -signal_width, FM_Y + message_y[x]-carrier_amplitude*1.5);
     }
     
