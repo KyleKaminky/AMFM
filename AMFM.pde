@@ -22,7 +22,7 @@ final float AM_Y = 1080*1/4;
 final int GAP = 50;
 float xspacing = 0.5;
 int signal_width;              // Width of entire wave
-int maxwaves = 3;   // total # of waves to add together
+int maxwaves = 4;   // total # of waves to add together
 float[] message_amplitude = new float[maxwaves];
 float[] message_frequencies = new float[maxwaves];
 final float F_MESSAGE_MAX = 2;
@@ -195,7 +195,7 @@ void initLines() {
 
 void initMessageAmplitudes() {
    for (int i = 0; i < maxwaves; i++) {
-    message_amplitude[i] = random(5,25);
+    message_amplitude[i] = random(10,20);
     //message_amplitude[i] = 5;
     //float period = random(100,300); // How many pixels before the wave repeats
     message_frequencies[i] = random(F_MESSAGE_MIN, F_MESSAGE_MAX);
@@ -240,7 +240,7 @@ void calcSignals() {
     println(str(delta_f) + " : " + str(message_y[i]));
     //float f = map(message_y[i], -50, 50, -1, 1);
     
-    sum += message_y[i]/2 - 10;
+    sum += message_y[i]/2 - 15;
     float phi = 2*PI*F_CARRIER*x - K_f*(sum+100);
     //float phi = F_CARRIER*x + K_f * message_y[i];
     fm_y[i] = carrier_amplitude*cos(phi);
