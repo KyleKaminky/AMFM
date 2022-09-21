@@ -7,12 +7,12 @@
 
 
 // Global Constants
-final int BG_COLOR = 0;
-final int FRAMEWORK_COLOR = 255;
-final int MESSAGE_COLOR = #FF0000;
-final int AM_COLOR = 255;
-final int FM_COLOR = 255;
-final int CARRIER_COLOR = 255;
+final int BG_COLOR = #1D1D1D;
+final int FRAMEWORK_COLOR = #FFFAFB;
+final int MESSAGE_COLOR = #8B80F9;//#80475E;
+final int AM_COLOR = #339989;
+final int FM_COLOR = #80475E;
+final int CARRIER_COLOR = #FFFAFB;
 
 final int TRIANGLE_SIZE = 10;
 final int MIXER_SIZE = 1080/15;
