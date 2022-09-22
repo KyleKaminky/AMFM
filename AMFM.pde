@@ -28,7 +28,7 @@ final int DASHED_LINE = 15;
 final int GAP = 50;
 float xspacing = 0.5;
 int signal_width;              // Width of entire wave
-int maxwaves = 4;   // total # of waves to add together
+int maxwaves = 5;   // total # of waves to add together
 float[] message_amplitude = new float[maxwaves];
 float[] message_frequencies = new float[maxwaves];
 final float F_MESSAGE_MAX = 2;
@@ -200,7 +200,7 @@ void initLines() {
   line_x_start = GAP + signal_width/2;
   line_x_finish = width/2 - MIXER_SIZE/2;
   
-  line_y_start = height/2 - int(carrier_amplitude) - 30;
+  line_y_start = height/2 - int(carrier_amplitude) - 25;
   line_y_finish = int(AM_Y);
   
   output_line_x_start = width/2 + MIXER_SIZE/2;
@@ -212,7 +212,7 @@ void initLines() {
 
 void initMessageAmplitudes() {
    for (int i = 0; i < maxwaves; i++) {
-    message_amplitude[i] = random(10,20);
+    message_amplitude[i] = random(5,17);
     //message_amplitude[i] = 5;
     //float period = random(100,300); // How many pixels before the wave repeats
     message_frequencies[i] = random(F_MESSAGE_MIN, F_MESSAGE_MAX);
@@ -252,7 +252,7 @@ void calcSignals() {
     
    // Calc FM
     sum += message_y[i]/2 - 15;
-    float phi = 2*PI*F_CARRIER*x - K_f*(sum+100);
+    float phi = 2*PI*F_CARRIER*x - K_f*(sum+15);
     fm_y[i] = carrier_amplitude*cos(phi);
     
     x+=dx;
@@ -286,7 +286,7 @@ void renderSignals(int s_opacity) {
     line((x-1)*xspacing+width - GAP -signal_width, FM_Y + fm_y[x-1], x*xspacing+width - GAP -signal_width, FM_Y+fm_y[x]);
     if ((x / DASHED_LINE) % 2 == 0){
       stroke(MESSAGE_COLOR, s_opacity);
-      line((x-1)*xspacing+width - GAP - signal_width, FM_Y + message_y[x-1] - carrier_amplitude*1.5, x*xspacing+width - GAP -signal_width, FM_Y + message_y[x]-carrier_amplitude*1.5);
+      line((x-1)*xspacing+width - GAP - signal_width, FM_Y + message_y[x-1] - carrier_amplitude*1.75, x*xspacing+width - GAP -signal_width, FM_Y + message_y[x]-carrier_amplitude*1.75);
     }
     
   }
