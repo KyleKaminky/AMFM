@@ -1,7 +1,8 @@
 /*
                     Amplitude and Frequency Modulation
                     ----------------------------------
-   Description
+   This sketch shows the difference between amplitude and frqeuency modulation. It has a random
+   continuous/analog message signal that is modulated onto a carrier signal.
    
 */
 
@@ -9,11 +10,10 @@
 // Global Constants
 final int BG_COLOR = #1D1D1D;
 final int FRAMEWORK_COLOR = #FFFAFB;
-final int MESSAGE_COLOR = #8B80F9;//#80475E;
+final int MESSAGE_COLOR = #8B80F9;
 final int AM_COLOR = #339989;
 final int FM_COLOR = #80475E;
 final int CARRIER_COLOR = #FFFAFB;
-
 final int TRIANGLE_SIZE = 10;
 final int MIXER_SIZE = 1080/15;
 final int WIDTH = 1080/3;
@@ -23,22 +23,19 @@ final int TITLE_Y = 50;
 final float FM_Y = 1080*3/4;
 final float AM_Y = 1080*1/4;
 final int DASHED_LINE = 15;
-
-// Global Variables
-final int GAP = 50;
-float xspacing = 0.5;
-int signal_width;              // Width of entire wave
-int maxwaves = 5;   // total # of waves to add together
-float[] message_amplitude = new float[maxwaves];
-float[] message_frequencies = new float[maxwaves];
 final float F_MESSAGE_MAX = 2;
 final float F_MESSAGE_MIN = 0.1;
-//float[] message_dx = new float[maxwaves];
 final float K_f = 0.01;
-
 final float F_CARRIER = 10;
 final float DELTA_THETA = 0.005;
+final int GAP = 50;
 
+// Global Variables
+float xspacing = 0.5;
+int signal_width;        
+int maxwaves = 5; 
+float[] message_amplitude = new float[maxwaves];
+float[] message_frequencies = new float[maxwaves];
 float theta = 0.0;  // Start angle at 0
 float carrier_amplitude = 80.0;  // Height of wave
 float period = 1000.0;  // How many pixels before the wave repeats
@@ -46,7 +43,6 @@ float dx;  // Value for incrementing X, a function of period and xspacing
 float[] carrier_y;  // Using an array to store height values for the wave
 float[] message_y;
 float[] am_y, fm_y;
-
 int line_x_start, line_x_finish, line_x_temp_finish;
 int line_y_start, line_y_finish, line_y_temp_finish;
 int signals_opacity = 0;
@@ -81,13 +77,7 @@ void setup() {
 void draw() {
   background(BG_COLOR);
   
-  switch(state) {
-    case "title":
-    
-    
-      break;
-      
-      
+  switch(state) {  
     case "initialize":
       drawFramework(framework_opacity);
       framework_opacity = framework_opacity >= 255 ? 255: framework_opacity + 5;
@@ -95,23 +85,16 @@ void draw() {
       if (framework_opacity == 255) {
         state = "draw";
       }
-    
       break;
-      
-      
+     
     case "draw":
       signals_opacity = signals_opacity >= 255 ? 255: signals_opacity + 5;
       drawFramework(255);
       calcSignals();
       renderSignals(signals_opacity);
       break;
-    
-    
   }
- 
-
 } // End of draw()
-
 
 
 // ---------- drawFramework() ---------
@@ -147,13 +130,11 @@ void drawFramework(int m_opacity) {
   line(width/2 - mixer_offset, FM_Y - mixer_offset, width/2 + mixer_offset, FM_Y + mixer_offset);
   line(width/2 - mixer_offset, FM_Y + mixer_offset, width/2 + mixer_offset, FM_Y - mixer_offset);
   
- 
   stroke(FRAMEWORK_COLOR, m_opacity);
   line(line_x_start, AM_Y, line_x_finish, AM_Y);
   line(line_x_start, FM_Y, line_x_finish, FM_Y);
   line(line_x_start, line_y_start, line_x_start, line_y_finish);
   line(line_x_start, height - line_y_start, line_x_start, width - line_y_finish);
-  
   
   // Vertical lines from carrier
   line(width/2, height/2 - carrier_amplitude*1.2, width/2, AM_Y + MIXER_SIZE/2);
@@ -190,8 +171,6 @@ void drawFramework(int m_opacity) {
   y_3 = AM_Y;
   triangle(x_1, y_1, x_2, y_2, x_3, y_3);
   triangle(x_1, height - y_1, x_2, height - y_2, x_3, height - y_3);
-  
-
 } // End of drawFramework()
 
 
@@ -205,22 +184,17 @@ void initLines() {
   
   output_line_x_start = width/2 + MIXER_SIZE/2;
   output_line_x_finish = width - width/12 - WIDTH;
-  output_line_x_temp_finish = output_line_x_start;
-
-  
+  output_line_x_temp_finish = output_line_x_start;  
 }
 
 void initMessageAmplitudes() {
    for (int i = 0; i < maxwaves; i++) {
     message_amplitude[i] = random(5,17);
-    //message_amplitude[i] = 5;
-    //float period = random(100,300); // How many pixels before the wave repeats
     message_frequencies[i] = random(F_MESSAGE_MIN, F_MESSAGE_MAX);
   }
 }
 
 void calcSignals() {
-  // Increment theta (try different values for 'angular velocity' here
   theta += DELTA_THETA;
   float x = theta;
   // Set all height values to zero
